@@ -1,4 +1,4 @@
-﻿using HtmlAgilityPack;
+﻿using WebCrawler.Extensions;
 
 namespace WebCrawler.Services.HtmlParser;
 
@@ -8,9 +8,11 @@ internal class HtmlParser : IHtmlParser
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(htmlContent, nameof(htmlContent));
 
-        // Load the HTML content into an HtmlDocument
-        var htmlDocument = new HtmlDocument();
-        htmlDocument.LoadHtml(htmlContent);
+        var isValid = htmlContent.IsValidHtml(out var htmlDocument);
+        if (!isValid)
+        {
+            throw new ArgumentException("Invalid HTML content", nameof(htmlContent));
+        }
 
         // Select all anchor tags
         return htmlDocument.DocumentNode.SelectNodes("//a[@href]")
